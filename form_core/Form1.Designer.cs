@@ -1689,7 +1689,6 @@
             textBox29.Name = "textBox29";
             textBox29.Size = new Size(90, 23);
             textBox29.TabIndex = 7;
-
             // 
             // textBox35
             // 
@@ -1697,7 +1696,6 @@
             textBox35.Name = "textBox35";
             textBox35.Size = new Size(90, 23);
             textBox35.TabIndex = 19;
-
             // 
             // label70
             // 
@@ -1714,7 +1712,6 @@
             textBox30.Name = "textBox30";
             textBox30.Size = new Size(90, 23);
             textBox30.TabIndex = 9;
-
             // 
             // label75
             // 
@@ -1740,7 +1737,6 @@
             textBox34.Name = "textBox34";
             textBox34.Size = new Size(90, 23);
             textBox34.TabIndex = 17;
-
             // 
             // label74
             // 
@@ -1757,7 +1753,6 @@
             textBox31.Name = "textBox31";
             textBox31.Size = new Size(90, 23);
             textBox31.TabIndex = 11;
-
             // 
             // textBox33
             // 
@@ -1765,7 +1760,6 @@
             textBox33.Name = "textBox33";
             textBox33.Size = new Size(90, 23);
             textBox33.TabIndex = 15;
-
             // 
             // label72
             // 
@@ -1791,7 +1785,7 @@
             textBox32.Name = "textBox32";
             textBox32.Size = new Size(90, 23);
             textBox32.TabIndex = 13;
-       // 
+            // 
             // tabPage10
             // 
             tabPage10.Controls.Add(button34);
@@ -2041,6 +2035,7 @@
             // 
             // dataGridView9
             // 
+            dataGridView9.AllowUserToAddRows = false;
             dataGridView9.BackgroundColor = SystemColors.ButtonHighlight;
             dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle8.BackColor = SystemColors.Control;
@@ -2125,6 +2120,7 @@
             // 
             // dataGridView10
             // 
+            dataGridView10.AllowUserToAddRows = false;
             dataGridView10.BackgroundColor = SystemColors.ButtonHighlight;
             dataGridViewCellStyle11.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle11.BackColor = SystemColors.Control;
@@ -2157,7 +2153,7 @@
             dataGridView10.RowHeadersDefaultCellStyle = dataGridViewCellStyle13;
             dataGridView10.RowHeadersWidth = 35;
             dataGridView10.RowTemplate.Height = 23;
-            dataGridView10.Size = new Size(744, 191);
+            dataGridView10.Size = new Size(800, 191);
             dataGridView10.TabIndex = 7;
             // 
             // dataGridViewTextBoxColumn33
@@ -2352,6 +2348,7 @@
             // 
             // dataGridView6
             // 
+            dataGridView6.AllowUserToAddRows = false;
             dataGridView6.BackgroundColor = SystemColors.ButtonHighlight;
             dataGridViewCellStyle14.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle14.BackColor = SystemColors.Control;
@@ -2436,6 +2433,7 @@
             // 
             // dataGridView8
             // 
+            dataGridView8.AllowUserToAddRows = false;
             dataGridView8.BackgroundColor = SystemColors.ButtonHighlight;
             dataGridViewCellStyle17.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle17.BackColor = SystemColors.Control;
@@ -2468,7 +2466,7 @@
             dataGridView8.RowHeadersDefaultCellStyle = dataGridViewCellStyle19;
             dataGridView8.RowHeadersWidth = 35;
             dataGridView8.RowTemplate.Height = 23;
-            dataGridView8.Size = new Size(742, 189);
+            dataGridView8.Size = new Size(802, 189);
             dataGridView8.TabIndex = 4;
             // 
             // dataGridViewTextBoxColumn20

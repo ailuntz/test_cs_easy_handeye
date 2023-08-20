@@ -2332,23 +2332,13 @@ namespace test_cs_easy_handeye
 
                 double[,] temprvecs = ConvertMattoArray(rvecs[0], false);
                 double[,] temptvecs = ConvertMattoArray(tvecs[0], false);
-                string temprvecsstring = string.Empty;
-                string temptvecsstring = string.Empty;
-                for (int i = 0; i < 3; i++)
-                {
-                    for (int j = 0; j < 3; j++)
-                    {
-                        temprvecsstring += "[" + i + "," + j + "]" + tempcameraMatrix[i, j].ToString() + "\n";
-                    }
-                    //temprvecsstring = temprvecsstring + "\n";
-                }
 
-                for (int i = 0; i < 5; i++)
-                {
-                    temptvecsstring += "[" + 0 + "," + i + "]" + tempdistCoeffs[0, i].ToString() + "\n";
-                }
-                richTextBox2.Text = "相机内参矩阵：\n" + temprvecsstring;
-                richTextBox3.Text = "相机畸变矩阵：\n" + temptvecsstring;
+                tabControl8.SelectedIndex = 0;
+
+                DisplaymatrixdatatorichTextBox(tempcameraMatrix, richTextBox2);
+                DisplaymatrixdatatorichTextBox(tempdistCoeffs, richTextBox3);
+
+
             }
             catch (Exception)
             {
@@ -2642,9 +2632,9 @@ namespace test_cs_easy_handeye
         private void DisplaymatrixdatatorichTextBox(double[,] datatemp, RichTextBox RichTextBoxtemp)
         {
             string tempstring = "";
-            for (int i = 0; i < (datatemp.Rank) + 1; i++)
+            for (int i = 0; i < datatemp.GetLength(0); i++)
             {
-                for (int j = 0; j < datatemp.GetUpperBound(datatemp.Rank - 1) + 1; j++)
+                for (int j = 0; j < datatemp.GetLength(1); j++)
                 {
                     tempstring += "[" + i + "," + j + "]" + datatemp[i, j].ToString() + "\n";
                 }
@@ -3308,40 +3298,16 @@ namespace test_cs_easy_handeye
 
 
             //It's finally coming to an end.
+            tabControl8.SelectedIndex = 2;
             if (comboBox1.SelectedIndex == 0 && R_cam2base != null && T_cam2base != null)
             {
-                string R_cam2basestring = null;
-                string T_cam2basestring = null;
-
-                for (int i = 0; i < 3; i++)
-                {
-                    for (int j = 0; j < 3; j++)
-                    {
-                        R_cam2basestring += "[" + i + "," + j + "]" + R_cam2base[i, j].ToString() + "\n";
-                    }
-
-                    T_cam2basestring += "[" + i + "]" + T_cam2base[0, i].ToString() + "\n";
-                }
-                richTextBox2.Text = "旋转矩阵：\n" + R_cam2basestring;
-                richTextBox3.Text = "平移矩阵：\n" + T_cam2basestring;
+                DisplaymatrixdatatorichTextBox(R_cam2base, richTextBox4);
+                DisplaymatrixdatatorichTextBox(T_cam2base, richTextBox5);
             }
             else if (comboBox1.SelectedIndex == 1 && R_cam2tool != null & T_cam2tool != null)
             {
-                string R_cam2toolstring = null;
-                string T_cam2toolstring = null;
-
-                for (int i = 0; i < 3; i++)
-                {
-                    for (int j = 0; j < 3; j++)
-                    {
-                        R_cam2toolstring += "[" + i + "," + j + "]" + R_cam2tool[i, j].ToString() + "\n";
-                    }
-
-                    T_cam2toolstring += "[" + i + "]" + T_cam2tool[0, i].ToString() + "\n";
-                }
-                richTextBox2.Text = "旋转矩阵：\n" + R_cam2toolstring;
-                richTextBox3.Text = "平移矩阵：\n" + T_cam2toolstring;
-
+                DisplaymatrixdatatorichTextBox(R_cam2tool, richTextBox4);
+                DisplaymatrixdatatorichTextBox(T_cam2tool, richTextBox5);
             }
 
         }
@@ -3429,12 +3395,6 @@ namespace test_cs_easy_handeye
             }
             else if (tabControl1.SelectedIndex == 2)
             {
-                tabPage23.Text = "手眼标定旋转矩阵";
-                tabPage24.Text = "手眼标定平移矩阵";
-                //手眼标定初始化
-                //
-
-
             }
 
             if (noSelectinternalparameter)
@@ -3497,12 +3457,124 @@ namespace test_cs_easy_handeye
                 dataGridView3.Rows.Clear();
                 dataGridView9.Rows.Clear();
 
-
+                Fillexperimentaldata();
 
             }
 
 
 
         }
+
+        //end 填充实验数据
+        private void Fillexperimentaldata()
+        {
+            //string Robotpose3DdataTypes = "quat";
+            string Robotpose3DdataTypes = "euler";
+
+            //string Campose3DdataTypes = "quat";
+            string Campose3DdataTypes = "euler";
+
+            //Robotpose3D数组形式数据
+            ///* x, y, z, rx, ry, rz//Robotpose3D第一组数据 eye-in-hand//rad//结果R=rx, ry, rz ,rw=-0.3546426, 0.3806739, 0.6086649, 0.5990351//T=tx, ty, tz= 149.8673153645521, 18.5544654988438, 308.2450983655534
+            double[,] _gripper2base_array_data = new double[,] { {144.4521161, 66.1347948, -465.7051590, -0.4743987, -0.2368566, -0.0782465},
+                                                             {150.2226899, 62.4463700, -484.2951369, -0.4732508,-0.2369567, -0.073467},
+                                                             {206.6077654, -27.9324378, -448.4078075, -0.6758548, -0.2354039, -0.1120374},
+                                                             {-43.4263308, 41.8964311, -453.4463616, -0.5101464, 0.2718147, 0.0053353},
+                                                             {207.5704729, 7.3753215, -406.3695738, -0.7015643, -0.362299, 0.0441629},
+                                                             {221.8741936, 106.2104049, -413.5291980, -0.4975038, -0.4841192, -0.072782},
+                                                             {168.6236789, 124.7429837, -444.4091351, -0.3671233, -0.427913, -0.0212725},
+                                                             {213.8876994, -13.8574024, -444.9478678, -0.6308002, -0.246069, -0.2131169},
+                                                            };//*/
+
+            //Campose3D数组形式数据
+            ///* x, y, z, rx, ry, rz//Campose3D第一组数据 eye-in-hand//rad
+            double[,] _gTarget2cam_array_data = new double[,] { {63.0860126137940, 28.9610333193357, 228.975775155220, -0.1689782, -0.0952185, -2.9322395},
+                                                             {59.7442727478359, 35.5178297229849, 212.756111469042, -0.1531844,-0.09427, -2.9339173},
+                                                             {-11.9672134192024, 40.7904688256321, 233.030780465295, -0.1634773, -0.0894502, -2.7370669},
+                                                             {23.1804880318842, 22.0425812434410, 248.264174105070, -0.3378254, 0.3893458, -2.8390293},
+                                                             {-26.1091716393323, 46.8289595121710, 293.129807580481, 0.053972, -0.0675675, -2.6800584},
+                                                             {54.9945317361700, 59.3875027697906, 267.443543451789, -0.0190344, -0.2970604, -2.8931871},
+                                                             {102.142407851122, 23.4048279722072, 240.333220152591, -0.0602194,-0.2573558, -3.0144933},
+                                                             {15.6263703407415, 39.1663493411513, 228.761080543106, -0.2303424, -0.1602727, -2.8007439},
+                                                            };//*/
+
+
+            try
+            {
+                if (_gripper2base_array_data != null && _gTarget2cam_array_data != null)
+                {
+
+                    if (Robotpose3DdataTypes == "quat")
+                    {
+                        dataGridView6.Rows.Clear();
+                        for (int i = 0; i < (_gripper2base_array_data.GetLength(0)); i++)
+                        {
+                            int index = dataGridView6.Rows.Add();
+                            DataGridViewRow dgvr = dataGridView6.Rows[index];
+                            for (int j = 0; j < _gripper2base_array_data.GetLength(1); j++)
+                            {
+                                dgvr.Cells[j].Value = _gripper2base_array_data[i, j];
+                            }
+                        }
+                    }
+                    else
+                    {
+                        dataGridView8.Rows.Clear();
+                        for (int i = 0; i < (_gripper2base_array_data.GetLength(0)); i++)
+                        {
+                            int index = dataGridView8.Rows.Add();
+                            DataGridViewRow dgvr = dataGridView8.Rows[index];
+                            for (int j = 0; j < _gripper2base_array_data.GetLength(1); j++)
+                            {
+                                dgvr.Cells[j].Value = _gripper2base_array_data[i, j];
+                            }
+                        }
+                    }
+
+                    if (Campose3DdataTypes == "quat")
+                    {
+                        dataGridView9.Rows.Clear();
+                        for (int i = 0; i < (_gTarget2cam_array_data.GetLength(0)); i++)
+                        {
+                            int index = dataGridView9.Rows.Add();
+                            DataGridViewRow dgvr = dataGridView9.Rows[index];
+                            for (int j = 0; j < _gTarget2cam_array_data.GetLength(1); j++)
+                            {
+                                dgvr.Cells[j].Value = _gTarget2cam_array_data[i, j];
+                            }
+                        }
+                    }
+                    else
+                    {
+                        dataGridView10.Rows.Clear();
+                        for (int i = 0; i < (_gTarget2cam_array_data.GetLength(0)); i++)
+                        {
+                            int index = dataGridView10.Rows.Add();
+                            DataGridViewRow dgvr = dataGridView10.Rows[index];
+                            for (int j = 0; j < _gTarget2cam_array_data.GetLength(1); j++)
+                            {
+                                dgvr.Cells[j].Value = _gTarget2cam_array_data[i, j];
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    Debug.Assert(true, "No data!");
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+
+        }
+
+
     }
 }

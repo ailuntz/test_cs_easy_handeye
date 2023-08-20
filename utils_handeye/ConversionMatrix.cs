@@ -47,7 +47,7 @@ namespace HandEyeCalibration
     //#将数组转换为Mat对象
     public static Mat ArraytoConvertMat(double[,] _ary)
         {
-                Mat result = new Mat((_ary.Rank)+1,_ary.GetUpperBound(_ary.Rank-1)+1,MatType.CV_64FC1,_ary);
+                Mat result = new Mat(_ary.GetLength(0), _ary.GetLength(1), MatType.CV_64FC1,_ary);
 
                 return result;
         }
