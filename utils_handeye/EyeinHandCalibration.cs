@@ -111,7 +111,21 @@ namespace HandEyeCalibration
                         //
                         Mat tmp_R_t2c = ArraytoConvertMat(tmp_qua_R_t2c);
 
-                        double[,] tmp_arry_t_t2c = new double[3, 1] { { _rtTarget2cam[i].X }, { _rtTarget2cam[i].Y }, { _rtTarget2cam[i].Z } };
+                        /////测试
+                        if (seq == "eyeinhand")
+                        {
+                        //眼在手上
+                        }
+                        else if (seq == "handtoeye")
+                        {
+                            //眼在手外
+                            var tmp_R_t2cinvtemp = tmp_R_t2c.Inv();
+                            tmp_R_t2c = tmp_R_t2cinvtemp.ToMat();
+                        }
+                        //////
+
+
+                    double[,] tmp_arry_t_t2c = new double[3, 1] { { _rtTarget2cam[i].X }, { _rtTarget2cam[i].Y }, { _rtTarget2cam[i].Z } };
                         Mat tmp_t_t2c = ArraytoConvertMat(tmp_arry_t_t2c);
                         //
                         R_target2cam[i] = tmp_R_t2c;

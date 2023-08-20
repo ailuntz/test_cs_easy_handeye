@@ -32,6 +32,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static OpenCvSharp.Stitcher;
 using OpenCvSharp.Flann;
 using System.Drawing.Drawing2D;
+using static System.Net.WebRequestMethods;
 
 namespace test_cs_easy_handeye
 {
@@ -2829,6 +2830,9 @@ namespace test_cs_easy_handeye
                 case 7:
                     tabControl4.SelectTab(1);
                     break;
+                case 8:
+                    tabControl4.SelectTab(2);
+                    break;
             }
         }
 
@@ -2863,7 +2867,9 @@ namespace test_cs_easy_handeye
                 case 7:
                     tabControl5.SelectTab(1);
                     break;
-
+                case 8:
+                    tabControl5.SelectTab(2);
+                    break;
 
             }
         }
@@ -3125,8 +3131,12 @@ namespace test_cs_easy_handeye
         //手眼标定结果计算
         private void button2_Click(object sender, EventArgs e)
         {
+            tabControl8.SelectedIndex = 2;
+            richTextBox4.Text = "计算中";
+            richTextBox5.Text = "计算中";
+
             //构建机器手位姿数据
-            if (comboBox2.SelectedIndex < 2 && dataGridView6.Rows.Count > 3)
+            if (comboBox2.SelectedIndex < 2 && dataGridView6.Rows.Count > 2)
             {
 
                 _rtgripper2base = new Robotpose3D[dataGridView6.Rows.Count];
@@ -3162,7 +3172,7 @@ namespace test_cs_easy_handeye
                     _rtgripper2base[i] = _rtgripper2basetemp;
                 }
             }
-            else if (comboBox2.SelectedIndex > 1 && dataGridView8.Rows.Count > 3)
+            else if (comboBox2.SelectedIndex > 1 && comboBox2.SelectedIndex < 8 && dataGridView8.Rows.Count > 2)
             {
 
                 _rtgripper2base = new Robotpose3D[dataGridView8.Rows.Count];
@@ -3188,7 +3198,7 @@ namespace test_cs_easy_handeye
 
                     string[] Rotationmode = new string[] { "xyz", "xzy", "yxz", "yzx", "zxy", "zyx" };
 
-                    Quaternion Robotpose3Dquat = EulerToQuaternion(rx, ry, rz, comboBox7.SelectedText.ToString(), Rotationmode[comboBox2.SelectedIndex - 2]);
+                    Quaternion Robotpose3Dquat = EulerToQuaternion(rx, ry, rz, comboBox7.SelectedItem.ToString(), Rotationmode[comboBox2.SelectedIndex - 2]);
 
                     _rtgripper2basetemp.W = Robotpose3Dquat.w;
                     _rtgripper2basetemp.Q1 = Robotpose3Dquat.x;
@@ -3198,9 +3208,56 @@ namespace test_cs_easy_handeye
                     _rtgripper2base[i] = _rtgripper2basetemp;
                 }
             }
+            else if (comboBox2.SelectedIndex == 8 && dataGridView2.Rows.Count > 2)
+            {
+
+                _rtgripper2base = new Robotpose3D[dataGridView2.Rows.Count];
+                for (int i = 0; i < dataGridView2.Rows.Count; i++)
+                {
+                    Robotpose3D _rtgripper2basetemp = new Robotpose3D();
+
+                    for (int j = 0; j < dataGridView2.Rows[i].Cells.Count; j++)
+                    {
+                        if (dataGridView2.Rows[i].Cells[j].Value == null)
+                        {
+                            dataGridView2.Rows[i].Cells[j].Value = 0;
+                        }
+                    }
+                    _rtgripper2basetemp.X = double.Parse(dataGridView2.Rows[i].Cells[0].Value.ToString());
+                    _rtgripper2basetemp.Y = double.Parse(dataGridView2.Rows[i].Cells[1].Value.ToString());
+                    _rtgripper2basetemp.Z = double.Parse(dataGridView2.Rows[i].Cells[2].Value.ToString());
+
+
+                    double rx = double.Parse(dataGridView2.Rows[i].Cells[3].Value.ToString());
+                    double ry = double.Parse(dataGridView2.Rows[i].Cells[4].Value.ToString());
+                    double rz = double.Parse(dataGridView2.Rows[i].Cells[5].Value.ToString());
+
+                    Mat RotVector = new Mat(1, 3, MatType.CV_64FC1);
+                    Mat Rotationmatrix = new Mat(3, 3, MatType.CV_64FC1);
+                    double[,] Rotationmatrixarry = null;
+                    RotVector.At<double>(0, 0) = rx;
+                    RotVector.At<double>(0, 1) = ry;
+                    RotVector.At<double>(0, 2) = rz;
+                    RotVector.At<double>(0, 0) /= (180 / Math.PI);      //度转弧度
+                    RotVector.At<double>(0, 1) /= (180 / Math.PI);
+                    RotVector.At<double>(0, 2) /= (180 / Math.PI);
+
+                    Rotationmatrix = RotVectorToRotationmatrix(RotVector, comboBox7.SelectedItem.ToString());
+                    Rotationmatrixarry = ConvertMattoArray(Rotationmatrix, false);
+
+                    double[] Robotpose3Dquatarry = RotationVectorToQuaternion(Rotationmatrixarry);
+
+                    _rtgripper2basetemp.W = Robotpose3Dquatarry[0];
+                    _rtgripper2basetemp.Q1 = Robotpose3Dquatarry[1];
+                    _rtgripper2basetemp.Q2 = Robotpose3Dquatarry[2];
+                    _rtgripper2basetemp.Q3 = Robotpose3Dquatarry[3];
+
+                    _rtgripper2base[i] = _rtgripper2basetemp;
+                }
+            }
 
             //构建相机位姿数据
-            if (comboBox9.SelectedIndex < 2 && dataGridView9.Rows.Count > 3)
+            if (comboBox9.SelectedIndex < 2 && dataGridView9.Rows.Count > 2)
             {
                 _rtTarget2cam = new Campose3D[dataGridView9.Rows.Count];
 
@@ -3236,7 +3293,7 @@ namespace test_cs_easy_handeye
                     _rtTarget2cam[i] = _rtTarget2camtemp;
                 }
             }
-            else if (comboBox9.SelectedIndex > 1 && dataGridView10.Rows.Count > 3)
+            else if (comboBox9.SelectedIndex > 1 && comboBox9.SelectedIndex < 8 && dataGridView10.Rows.Count > 2)
             {
                 _rtTarget2cam = new Campose3D[dataGridView10.Rows.Count];
                 for (int i = 0; i < dataGridView10.Rows.Count; i++)
@@ -3262,7 +3319,7 @@ namespace test_cs_easy_handeye
 
                     string[] Rotationmode = new string[] { "xyz", "xzy", "yxz", "yzx", "zxy", "zyx" };
 
-                    Quaternion Campose3Dquat = EulerToQuaternion(rx, ry, rz, comboBox8.SelectedText.ToString(), Rotationmode[comboBox9.SelectedIndex - 2]);
+                    Quaternion Campose3Dquat = EulerToQuaternion(rx, ry, rz, comboBox8.SelectedItem.ToString(), Rotationmode[comboBox9.SelectedIndex - 2]);
 
                     _rtTarget2camtemp.W = Campose3Dquat.w;
                     _rtTarget2camtemp.Q1 = Campose3Dquat.x;
@@ -3272,7 +3329,53 @@ namespace test_cs_easy_handeye
                     _rtTarget2cam[i] = _rtTarget2camtemp;
                 }
             }
+            else if (comboBox9.SelectedIndex == 8 && dataGridView7.Rows.Count > 2)
+            {
+                _rtTarget2cam = new Campose3D[dataGridView7.Rows.Count];
+                for (int i = 0; i < dataGridView7.Rows.Count; i++)
+                {
+                    for (int j = 0; j < dataGridView7.Rows[i].Cells.Count; j++)
+                    {
+                        if (dataGridView7.Rows[i].Cells[j].Value == null)
+                        {
+                            dataGridView7.Rows[i].Cells[j].Value = 0;
+                        }
+                    }
 
+                    Campose3D _rtTarget2camtemp = new Campose3D();
+
+                    _rtTarget2camtemp.X = double.Parse(dataGridView7.Rows[i].Cells[0].Value.ToString());
+                    _rtTarget2camtemp.Y = double.Parse(dataGridView7.Rows[i].Cells[1].Value.ToString());
+                    _rtTarget2camtemp.Z = double.Parse(dataGridView7.Rows[i].Cells[2].Value.ToString());
+
+
+                    double rx = double.Parse(dataGridView7.Rows[i].Cells[3].Value.ToString());
+                    double ry = double.Parse(dataGridView7.Rows[i].Cells[4].Value.ToString());
+                    double rz = double.Parse(dataGridView7.Rows[i].Cells[5].Value.ToString());
+
+                    Mat RotVector = new Mat(1, 3, MatType.CV_64FC1);
+                    Mat Rotationmatrix = new Mat(3, 3, MatType.CV_64FC1);
+                    double[,] Rotationmatrixarry = null;
+                    RotVector.At<double>(0, 0) = rx;
+                    RotVector.At<double>(0, 1) = ry;
+                    RotVector.At<double>(0, 2) = rz;
+                    RotVector.At<double>(0, 0) /= (180 / Math.PI);      //度转弧度
+                    RotVector.At<double>(0, 1) /= (180 / Math.PI);
+                    RotVector.At<double>(0, 2) /= (180 / Math.PI);
+
+                    Rotationmatrix = RotVectorToRotationmatrix(RotVector, comboBox7.SelectedItem.ToString());
+                    Rotationmatrixarry = ConvertMattoArray(Rotationmatrix, false);
+
+                    double[] Campose3Dquatarry = RotationVectorToQuaternion(Rotationmatrixarry);
+
+                    _rtTarget2camtemp.W = Campose3Dquatarry[0];
+                    _rtTarget2camtemp.Q1 = Campose3Dquatarry[1];
+                    _rtTarget2camtemp.Q2 = Campose3Dquatarry[2];
+                    _rtTarget2camtemp.Q3 = Campose3Dquatarry[3];
+
+                    _rtTarget2cam[i] = _rtTarget2camtemp;
+                }
+            }
 
 
             string[] Calibrationmode = new string[] { "eyeinhand", "handtoeye" };
@@ -3283,13 +3386,13 @@ namespace test_cs_easy_handeye
             double[,] R_cam2tool = null;
             double[,] T_cam2tool = null;
 
-            if (_rtgripper2base.Length == _rtTarget2cam.Length && _rtTarget2cam.Length > 3)
+            if (_rtgripper2base.Length == _rtTarget2cam.Length && _rtTarget2cam.Length > 2)
             {
-                if (comboBox1.SelectedIndex == 0)
+                if (comboBox1.SelectedIndex == 1)
                 {
                     (R_cam2base, T_cam2base) = HandtoEyeCalibration(_rtgripper2base, _rtTarget2cam, Calibrationmode[comboBox1.SelectedIndex]);
                 }
-                else
+                else if (comboBox1.SelectedIndex == 0)
                 {
                     (R_cam2tool, T_cam2tool) = HandtoEyeCalibration(_rtgripper2base, _rtTarget2cam, Calibrationmode[comboBox1.SelectedIndex]);
                 }
@@ -3298,13 +3401,13 @@ namespace test_cs_easy_handeye
 
 
             //It's finally coming to an end.
-            tabControl8.SelectedIndex = 2;
-            if (comboBox1.SelectedIndex == 0 && R_cam2base != null && T_cam2base != null)
+
+            if (comboBox1.SelectedIndex == 1 && R_cam2base != null && T_cam2base != null)
             {
                 DisplaymatrixdatatorichTextBox(R_cam2base, richTextBox4);
                 DisplaymatrixdatatorichTextBox(T_cam2base, richTextBox5);
             }
-            else if (comboBox1.SelectedIndex == 1 && R_cam2tool != null & T_cam2tool != null)
+            else if (comboBox1.SelectedIndex == 0 && R_cam2tool != null & T_cam2tool != null)
             {
                 DisplaymatrixdatatorichTextBox(R_cam2tool, richTextBox4);
                 DisplaymatrixdatatorichTextBox(T_cam2tool, richTextBox5);
@@ -3470,12 +3573,14 @@ namespace test_cs_easy_handeye
         {
             //string Robotpose3DdataTypes = "quat";
             string Robotpose3DdataTypes = "euler";
+            //string Robotpose3DdataTypes = "RotVector";
 
-            //string Campose3DdataTypes = "quat";
-            string Campose3DdataTypes = "euler";
+            string Campose3DdataTypes = "quat";
+            //string Campose3DdataTypes = "euler";
+            //string Campose3DdataTypes = "RotVector";
 
             //Robotpose3D数组形式数据
-            ///* x, y, z, rx, ry, rz//Robotpose3D第一组数据 eye-in-hand//rad//结果R=rx, ry, rz ,rw=-0.3546426, 0.3806739, 0.6086649, 0.5990351//T=tx, ty, tz= 149.8673153645521, 18.5544654988438, 308.2450983655534
+            /* x, y, z, rx, ry, rz//Robotpose3D第一组数据 eye-in-hand//rad//结果R=rx, ry, rz ,rw=-0.3546426, 0.3806739, 0.6086649, 0.5990351//T=tx, ty, tz= 149.8673153645521, 18.5544654988438, 308.2450983655534
             double[,] _gripper2base_array_data = new double[,] { {144.4521161, 66.1347948, -465.7051590, -0.4743987, -0.2368566, -0.0782465},
                                                              {150.2226899, 62.4463700, -484.2951369, -0.4732508,-0.2369567, -0.073467},
                                                              {206.6077654, -27.9324378, -448.4078075, -0.6758548, -0.2354039, -0.1120374},
@@ -3485,9 +3590,80 @@ namespace test_cs_easy_handeye
                                                              {168.6236789, 124.7429837, -444.4091351, -0.3671233, -0.427913, -0.0212725},
                                                              {213.8876994, -13.8574024, -444.9478678, -0.6308002, -0.246069, -0.2131169},
                                                             };//*/
+            /* x, y, z, rx, ry, rz//Robotpose3D第二组数据 hand-to-eye//rad//结果R=rx, ry, rz ,rw=0.1425639, 0.1237163, -0.0709875, 0.9794542//T=tx, ty, tz= 689.2978893974176, 386.9843567965046, 573.5786306809142
+            double[,] _gripper2base_array_data = new double[,] { {377.18,346.69, 581.09, -2.1895155, 1.4149385, -0.7845255},
+                                                     {390.68, 344.43, 577.58, -2.0561725,1.4149385, -0.7840018},
+                                                     {383.86, 351.50, 566.52, -1.1843802, 1.4220942, 1.6646948},
+                                                     {402.21, 291.88, 557.76, -1.4454816, 1.1091567, -1.3946927},
+                                                    };//*/
+
+            //* x, y, z, rx, ry, rz//zyx//Robotpose3D第三组数据（现场采集） hand-to-eye//rad//结果R=\
+            double[,] _gripper2base_array_data = new double[,] {
+                {867.699,   71.162,  385.037, 180, 0,   0},
+                {855.409,   74.817 , 391.161, 172.903 ,-8.948 ,-10.337 },
+                {1055.17,   80.918,  395.283, -167.921,    0.348 ,  159.597 },
+                {874.167,   203.736, 405.933, -165.132,    -4.456 , -22.881 },
+                {836.035 ,  75.508 , 385.724 ,-173.825 ,   0.219  , 16.821 },
+                {815.745 ,  110.001, 393.791 ,-174.991 ,   -4.518 , 32.231   },
+                {962.724 ,  24.351  ,388.702 ,-176.485 ,   -2.584 , 136.069  },
+                {908.375 ,  100.09 , 368.998 ,-169.627 ,   8.902  , 80.819   },
+                {859.499 ,  50.482  ,382.074 ,-178.799 ,   -0.525 , -9.949   },
+                {1060.93  , -22.56  ,387.697 ,-174.637 ,   -1.123 , 70.961   },
+                { 888.886 , 63.374 , 396.199 ,-177.892 ,   -7.702  ,57.681  },
+                {856.113  , 96.102 , 353.72  ,170.778 ,5.543   ,81.936   },
+                {984.187 ,  34.762 , 363.128 ,-171.736 ,   10.596 , 94.496 },
+                { 1031.59 , -39.38 , 410.165 ,-173.574  ,  -14.636 ,115.58},
+                { 1103.34 , 125.125 ,378.396 ,-178.559  ,  1.379  , 150.637 }
+            };//*/
+
+            /* x, y, z, rx, ry, rz//Robotpose3D第四组数据（张扬） eye-in-hand//rad//结果R=//T=tx, ty, tz=-0.0601215675088463,-0.3223385694500517, 0.10481985839295936
+            double[,] _gripper2base_array_data = new double[,] {
+               {-0.15242, -0.088, 1.09041, -16.102, 25.659, 123.69},
+               {-0.088, -0.15242, 1.09041, -26.565, 14.478, 153.435},
+               {0.000, -0.176, 1.09041, -30.00, 0.00, -180.00},
+               {0.088, -0.15242, 1.09041, -26.565, -14.478, -153.435 },
+               {0.15242, -0.088, 1.09041, -16.102, -25.659, -123.69},
+               {-0.176, 0.000, 1.09041, 0.00, 30.00, 90.00 },
+               {-0.176, 0.29538, 1.011126, -30.00, 30.00, 90.00},
+               {-0.16716, 0.2668, 1.02776, -46.102, 25.659, 123.69 },
+               {-0.143, 0.24588, 1.03984, -56.565, 14.478, 153.435 },
+               {-0.2119, 0.26178, 0.98782, -83.948, -18.937, 126.052},
+           };//*/
+
+            /* x, y, z, rx, ry, rz, rw//Robotpose3D第五组数据 eye-in-hand//rad//结果R= //T=tx, ty, tz= -0.261030962036173, -1.0424308926443318, 0.5365339946917028
+            double[,] _gripper2base_array_data = new double[,] {
+               {0.4285232296,0.1977596461,-0.5595823047,0.4738016082,0.3209333657,-0.2268795901,-0.7880605703},
+               {0.2265712272,0.0261943502,-0.6661910850,0.5222343809,0.0461668455,-0.1315038186,-0.8413362107},
+               {0.1058885008,0.0527681997,-0.7419267756,0.5081638565,-0.0263721340,-0.1696570449,-0.8439730402},
+               {0.1127224767,-0.0420359377,-0.7413071786,0.5101706595,-0.0322252464,-0.1864402870,-0.8390038445 },
+               {0.2592932751,-0.0329068529,-0.7162865014,0.5101641882,0.1265739325,-0.0153077050,-0.8505746380},
+               {-0.1724239544,0.0084144761,-0.6998332592,0.4989369998,-0.0973210400,-0.1244194561,-0.8521210503 },
+               {-0.0534271258,0.0771779706,-0.6845820453,0.5195499916,0.0511217081,-0.1691595167,-0.8359661686},
+               {0.2598500029,0.0933230213,-0.6638257382,0.5673912325,0.1686973705,-0.1427337629,-0.7932436318},
+            };//*/
+
+            /* x, y, z, rx, ry, rz旋转向量//Robotpose3D第六组数据 eye-in-hand//rad//结果R= 
+            double[,] _gripper2base_array_data = new double[,] {
+               {0.400422,-0.0262847,0.365594,3.12734,-0.0857978,-0.0168582},
+               {0.423347,-0.16857,0.340184,-2.73844,0.089013,0.123284},
+               {0.42540,0.19543,0.29062,2.44351,-0.1777,-0.0722},
+               {0.58088,-0.0541,0.32633,-2.9303,0.06957,0.98985},
+               {0.2760,-0.033,0.3301,3.0813,0.0724,0.6077},
+               {0.54011,0.09071,0.34623,2.62279,0.75876,-0.6927 },
+               {0.57732,-0.1346,0.37990,-2.6764,1.04868,0.82177},
+               {0.27844,-0.1371,0.28799,-0.8233,2.26319,0.36110},
+            };//*/
+
+            /* x, y, z, rx, ry, rz//zyx//Robotpose3D第七组数据(鱼香ros) eye-in-hand//rad//结果R= //T=tx, ty, tz=-0.020797737310176513,0.008898274229924556,0.0832451390072893
+            double[,] _gripper2base_array_data = new double[,] {
+               {1.1988093940033604, -0.42405585264804424, 0.18828251788562061, 151.3390418721659, -18.612399542280507, 153.05074895025035},
+               {1.1684831621733476, -0.183273375514656, 0.12744868246620855, -161.57083804238462, 9.07159838346732, 89.1641128844487},
+               {1.1508343174145468, -0.22694301453461405, 0.26625166858469146, 177.8815855486261, 0.8991159570568988, 77.67286224959672},
+            };//*/
+
 
             //Campose3D数组形式数据
-            ///* x, y, z, rx, ry, rz//Campose3D第一组数据 eye-in-hand//rad
+            /* x, y, z, rx, ry, rz//Campose3D第一组数据 eye-in-hand//rad
             double[,] _gTarget2cam_array_data = new double[,] { {63.0860126137940, 28.9610333193357, 228.975775155220, -0.1689782, -0.0952185, -2.9322395},
                                                              {59.7442727478359, 35.5178297229849, 212.756111469042, -0.1531844,-0.09427, -2.9339173},
                                                              {-11.9672134192024, 40.7904688256321, 233.030780465295, -0.1634773, -0.0894502, -2.7370669},
@@ -3497,6 +3673,77 @@ namespace test_cs_easy_handeye
                                                              {102.142407851122, 23.4048279722072, 240.333220152591, -0.0602194,-0.2573558, -3.0144933},
                                                              {15.6263703407415, 39.1663493411513, 228.761080543106, -0.2303424, -0.1602727, -2.8007439},
                                                             };//*/
+            /* x, y, z, rx, ry, rz//Campose3D第二组数据 hand-to-eye//rad//
+            double[,] _gTarget2cam_array_data = new double[,] { {-48.4528696972388, -32.9428131930746, 161.065631617250, -0.1588792, -0.0973543,0.1438789},
+                                                             {-62.0013541116839, -34.1299719569008, 164.980813774003, -0.0257775,-0.083593, 0.1545468},
+                                                             {-55.0705381175398, -26.7901391225223, 143.932686495397, -0.0436629, 0.0437994, 0.1565832},
+                                                             {-59.7908161911226, -10.7263017825663, 154.702510082749, -0.0523258, 0.0306989, 0.4666219},
+                                                            };//*/
+            //* x, y, z, rx, ry, rz//Campose3D第三组数据 hand-to-eye//rad//
+            double[,] _gTarget2cam_array_data = new double[,] { 
+                {27.6324, -53.0011, 450.756, 0.121504, -0.644529, 0.751784, 0.068111 },
+                {-11.0989, -58.8588, 486.592, 0.120802 ,-0.578598, 0.805448 ,-0.043418 },
+                {105.903, 202.833 ,440.508, 0.113889, 0.844049, 0.4874 ,-0.192487 },
+                {9.23523 ,61.6075 ,450.489, 0.264242, -0.475601, 0.835247, 0.079638 },
+                {32.2274 ,-11.2691, 439.197, -0.141923, 0.741567, -0.644095, -0.122793  },
+                {44.0665 ,57.3595 ,458.317, -0.151062, 0.825444, -0.533026, -0.108193 },
+                { 70.2627 ,164.667, 454.991, 0.016103, 0.936717, 0.317122, -0.147433 },
+                { 130.146, 149.865, 404.127, 0.01959, 0.961815, -0.17028, -0.213384 },
+                {-7.24689 ,-83.1921 ,444.861, 0.139143, -0.576354 ,0.802849, 0.062355  },
+                { 272.997 ,-12.7755, 452.168, -0.073126, 0.957137, -0.235625, -0.151721 },
+                {123.27 ,64.9186 ,474.978, -0.136874, 0.926738 ,-0.335978 ,-0.097673 },
+                {87.2197 ,161.189 ,432.953, 0.021355, 0.987728 ,-0.149382 ,-0.04028  },
+                { 178.767, 105.118 ,400.958, 0.066204 ,0.978165, -0.058339, -0.188168 },
+                {171.641, 73.7655 ,494.311, -0.114663, 0.961687, 0.166144, -0.185488  },
+                {188.657 ,245.794, 446.236, 0.063376, 0.893822 ,0.429315, -0.112931  }
+                };//*/
+
+            /* x, y, z, rx, ry, rz//zyx//Campose3D第四组数据 eye-in-hand//rad//
+            double[,] _gTarget2cam_array_data = new double[,] { 
+                {-0.53251566, -0.22288134, 2.99978054, -2.156571314953374, 17.96836783899952, 2.202110000510372},
+                {-0.44328823, -0.22978619, 2.4122036, 10.04677425761553, 13.217722658140007, -0.7569076141309594},
+                {-0.46990779, -0.32840453, 2.51890204, -0.5969738940715268, 19.56503505626854, 0.8598698487893537},
+                {-0.48391721, -0.40351177, 2.27804699, 7.556253345854567, 16.256789925212452, 0.033714555538883036},
+                {-0.57208587, -0.41269304, 2.58571284, 2.8633130363738593, 15.726493994549273, -0.7115981116920139 },
+                {-0.49422756, -0.1702189, 2.87315438, -2.027545230194479, 16.468005086809477, -1.6960828431755508 },
+                {-0.51349264, -0.28100387, 2.58778224, -1.2724871238262014, 21.200229674555533, -3.904702217196404 },
+                {-0.53673736, -0.3091575, 2.71723579, -1.9171757971606331, 25.09560299293162, -3.955331059805344 },
+                {-0.69796816, -0.40532881, 2.3216764, 2.493097502965668, 4.673219102172305, -0.6131885996737292},
+                {-0.69438171, -0.16458288, 2.32894208, 3.074091031173201, 6.698654128807315, -1.3210092006224454},
+                };//*/
+
+            /* x, y, z, rx, ry, rz, rw//Campose3D第五组数据 eye-in-hand//rad//
+            double[,] _gTarget2cam_array_data = new double[,] { 
+                {0.4277459616,-0.0267754900,0.0822384718,0.3555198802,-0.2313832954,-0.6738796808,-0.6049409568},
+                {0.4610891450,-0.0089776615,0.0394863697,-0.4168581229,0.4389318994,0.4953132086,0.6230833961},
+                {0.4159190432,0.0112235849,0.0112504715,-0.3559197420,0.4898053987,0.4542453721,0.6535081871},
+                {0.4143974465,0.0094036803,0.1073298638,-0.3438949365,0.4875942762,0.4507613906,0.6639294113},
+                {0.3473267442,-0.1866610227,0.0651366494,0.4966101920,-0.4291949558,-0.5361047392,-0.5308123169 },
+                {0.3883165305,-0.2249779584,0.0093256602,-0.3595692001,0.5529429756,0.4090559739,0.6305848604 },
+                {0.4309364801,-0.2354261800,-0.0925819097,-0.3831460128,0.4244707870,0.5043032275,0.6470718186},
+                {0.4362292324,-0.0778107597,-0.1007970399,0.4568889439,-0.3144470665,-0.5302104578,-0.6412896427 },
+                };//*/
+
+            /* x, y, z, rx, ry, rz旋转向量//Campose3D第六组数据 hand-to-eye//rad//
+            double[,] _gTarget2cam_array_data = new double[,] {
+               {0.11725,0.05736,0.32176,0.02860,-0.1078,3.06934},
+               {0.07959,0.06930,0.29829,0.66126,-0.2127,2.99042},
+               {0.14434,0.03227,0.40377,-0.9465,-0.1744,2.80668},
+               {0.11008,0.05605,0.35730,0.12422,-1.0665,2.87604},
+               {0.1131,0.0438171,0.299624,-0.058278,-0.514154,-3.06309},
+               {0.057039,0.109464,0.415275,0.414777,0.750109,-2.49495 },
+               {0.13702,0.00520,0.38190,0.26431,-0.7554,2.26885},
+               {-0.03670,-0.04433,0.237292,0.807501,-0.27347,0.614594},
+                };//*/
+
+            /* x, y, z, rx, ry, rz//zyx//Campose3D第七组数据 eye-in-hand//rad//
+            double[,] _gTarget2cam_array_data = new double[,] {
+               {-0.16249272227287292, -0.047310635447502136, 0.4077761471271515, -56.98037030812389, -6.16739631361851, -115.84333735802369},
+               {0.03955405578017235, -0.013497642241418362, 0.33975949883461, -100.87129330834215, -17.192685528625265, -173.07354634882094},
+               {-0.08517949283123016, 0.00957852229475975, 0.46546608209609985, -90.85270962096058, 0.9315977976503153, 175.2059707654342},
+                };//*/
+
+
 
 
             try
@@ -3517,13 +3764,26 @@ namespace test_cs_easy_handeye
                             }
                         }
                     }
-                    else
+                    else if (Robotpose3DdataTypes == "euler")
                     {
                         dataGridView8.Rows.Clear();
                         for (int i = 0; i < (_gripper2base_array_data.GetLength(0)); i++)
                         {
                             int index = dataGridView8.Rows.Add();
                             DataGridViewRow dgvr = dataGridView8.Rows[index];
+                            for (int j = 0; j < _gripper2base_array_data.GetLength(1); j++)
+                            {
+                                dgvr.Cells[j].Value = _gripper2base_array_data[i, j];
+                            }
+                        }
+                    }
+                    else if (Robotpose3DdataTypes == "RotVector")
+                    {
+                        dataGridView2.Rows.Clear();
+                        for (int i = 0; i < (_gripper2base_array_data.GetLength(0)); i++)
+                        {
+                            int index = dataGridView2.Rows.Add();
+                            DataGridViewRow dgvr = dataGridView2.Rows[index];
                             for (int j = 0; j < _gripper2base_array_data.GetLength(1); j++)
                             {
                                 dgvr.Cells[j].Value = _gripper2base_array_data[i, j];
@@ -3544,13 +3804,26 @@ namespace test_cs_easy_handeye
                             }
                         }
                     }
-                    else
+                    else if (Campose3DdataTypes == "euler")
                     {
                         dataGridView10.Rows.Clear();
                         for (int i = 0; i < (_gTarget2cam_array_data.GetLength(0)); i++)
                         {
                             int index = dataGridView10.Rows.Add();
                             DataGridViewRow dgvr = dataGridView10.Rows[index];
+                            for (int j = 0; j < _gTarget2cam_array_data.GetLength(1); j++)
+                            {
+                                dgvr.Cells[j].Value = _gTarget2cam_array_data[i, j];
+                            }
+                        }
+                    }
+                    else if (Campose3DdataTypes == "RotVector")
+                    {
+                        dataGridView7.Rows.Clear();
+                        for (int i = 0; i < (_gTarget2cam_array_data.GetLength(0)); i++)
+                        {
+                            int index = dataGridView7.Rows.Add();
+                            DataGridViewRow dgvr = dataGridView7.Rows[index];
                             for (int j = 0; j < _gTarget2cam_array_data.GetLength(1); j++)
                             {
                                 dgvr.Cells[j].Value = _gTarget2cam_array_data[i, j];
@@ -3574,7 +3847,6 @@ namespace test_cs_easy_handeye
 
 
         }
-
 
     }
 }
