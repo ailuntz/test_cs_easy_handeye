@@ -1,12 +1,15 @@
 //shgt
 
+using HandEyeCalibration;
+
 namespace test_cs_easy_handeye
 {
+    //*
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
+            /// <summary>
+            ///  The main entry point for the application.
+            /// </summary>
         [STAThread]
         static void Main()
         {
@@ -15,5 +18,5 @@ namespace test_cs_easy_handeye
             ApplicationConfiguration.Initialize();
             Application.Run(new test_cs_easy_handeye.Form1());
         }
-    }
+    }//*/
 }

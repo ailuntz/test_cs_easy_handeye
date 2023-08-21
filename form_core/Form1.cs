@@ -42,6 +42,8 @@ namespace test_cs_easy_handeye
         #region Constructor
         public Form1()
         {
+
+
             InitializeComponent();
             Icon = ClientUtils.GetAppIcon();
         }
@@ -1823,6 +1825,13 @@ namespace test_cs_easy_handeye
                             }
                             if (!MyFrame.Texture.Empty())
                             {
+                                float[] curBitmaparry = MyFrame.Texture.GetDataCopy();
+                                Texture32f curBitmap = MyFrame.Texture;
+
+                                Bitmap Bitmaptemp = BGR24ToBitmap(curBitmaparry, curBitmap.Size.Width, curBitmap.Size.Height);
+                                //pictureBox2.
+                                pictureBox1.Image = Bitmaptemp;
+
                                 Console.WriteLine("    Texture: {0} x {1} Type: {2}", MyFrame.Texture.Size.Width, MyFrame.Texture.Size.Height, Texture32f.GetElementName());
                             }
                             if (!MyFrame.TextureRGB.Empty())
@@ -1831,13 +1840,6 @@ namespace test_cs_easy_handeye
                             }
                             if (!MyFrame.ColorCameraImage.Empty())
                             {
-
-                                ushort[] curBitmaparry = MyFrame.ColorCameraImage.GetDataCopy();
-                                TextureRGB16 curBitmap = MyFrame.ColorCameraImage;
-
-                                Bitmap Bitmaptemp = BGR24ToBitmap(curBitmaparry, curBitmap.Size.Width, curBitmap.Size.Height);
-                                //pictureBox2.
-                                pictureBox1.Image = Bitmaptemp;
 
                             }
                         }
@@ -1860,7 +1862,68 @@ namespace test_cs_easy_handeye
         }
 
         //BGR24位数据转Bitmap
-        public Bitmap BGR24ToBitmap(ushort[] imgBGR, int vw, int vh)
+        public Bitmap BGR24ToBitmap(float[] imgBGR, int vw, int vh)
+        {
+
+            int p = 0;
+            int vW = vw;
+            int vH = vh;
+
+
+            ////量化
+            Srcquantification Srcquantificationtemp = new Srcquantification();
+
+            Srcquantificationtemp.Srcmax = 3.402823466e+38F;
+            Srcquantificationtemp.Srcmin = 1.175494351e-38F;
+            Dstquantification Dstquantificationtemp = new Dstquantification();
+
+            Dstquantificationtemp.Dstmax = 255;
+            Dstquantificationtemp.Dstmin = 0;
+
+            Utilsquantification.Quantification(Srcquantificationtemp, Dstquantificationtemp, out float Scalin, out float zero);
+
+            float[] src = { 2.1f, 8.6f };
+            sbyte[] dst = new sbyte[src.Length];
+
+            Utilsquantification.Quantificationout(Scalin, zero, src, out dst);
+            ////
+
+
+
+            Bitmap bmp = new Bitmap(vW, vH, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            if (imgBGR != null)
+            {
+                //构造一个位图数组进行数据存储
+                byte[] rgbvalues = new byte[imgBGR.Length*3];
+
+                //对每一个像素的颜色进行转化
+                for (int i = 0; i < rgbvalues.Length; i += 3)
+                {
+                    rgbvalues[i] = (byte)imgBGR[i/3];
+                    rgbvalues[i + 1] = (byte)imgBGR[i/3];
+                    rgbvalues[i + 2] = (byte)imgBGR[i/3];
+                }
+
+                //位图矩形
+                Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+                //以可读写的方式将图像数据锁定
+                System.Drawing.Imaging.BitmapData bmpdata = bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+                //得到图形在内存中的首地址
+                IntPtr ptr = bmpdata.Scan0;
+
+                //将被锁定的位图数据复制到该数组内
+                //System.Runtime.InteropServices.Marshal.Copy(ptr, rgbvalues, 0, imgBGR.Length);
+                //把处理后的图像数组复制回图像
+                System.Runtime.InteropServices.Marshal.Copy(rgbvalues, 0, ptr, imgBGR.Length);
+                //解锁位图像素
+                bmp.UnlockBits(bmpdata);
+
+            }
+            return bmp;
+        }
+
+        /*public Bitmap BGR24ToBitmap(float[] imgBGR, int vw, int vh)
         {
 
             int p = 0;
@@ -1899,7 +1962,7 @@ namespace test_cs_easy_handeye
 
             }
             return bmp;
-        }
+        }*/
 
 
         public byte[] bitmap2BGR24(Bitmap img)
@@ -2053,8 +2116,8 @@ namespace test_cs_easy_handeye
                 if (Picturestoragepath != string.Empty)
                 {
 
-                    string imagePath = System.IO.Path.Combine(Picturestoragepath, "图像" + DateTime.Now.ToString("yyyyMMdd") + ".Bitmap");
-                    pictureBox1.Image.Save(imagePath);
+                    string imagePath = System.IO.Path.Combine(Picturestoragepath, "图像" + DateTime.Now.ToString("yyyyMMdd") + ".Bmp");
+                    pictureBox1.Image.Save(imagePath, System.Drawing.Imaging.ImageFormat.Bmp);
                 }
 
 
@@ -3038,11 +3101,11 @@ namespace test_cs_easy_handeye
                         if (!MyFrame.Empty())
                         {
 
-                            if (!MyFrame.ColorCameraImage.Empty())
+                            if (!MyFrame.Texture.Empty())
                             {
 
-                                ushort[] curBitmaparry = MyFrame.ColorCameraImage.GetDataCopy();
-                                TextureRGB16 curBitmap = MyFrame.ColorCameraImage;
+                                float[] curBitmaparry = MyFrame.Texture.GetDataCopy();
+                                Texture32f curBitmap = MyFrame.Texture;
 
                                 Bitmaptemp = BGR24ToBitmap(curBitmaparry, curBitmap.Size.Width, curBitmap.Size.Height);
 
