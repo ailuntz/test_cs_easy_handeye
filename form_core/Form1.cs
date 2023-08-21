@@ -752,7 +752,8 @@ namespace test_cs_easy_handeye
             {
                 DataValue dataValue = dataValues[1 + startIndex];
 
-                if (dataValue.WrappedValue.TypeInfo != null)
+                BuiltInType Null = default;
+                if (dataValue.WrappedValue.TypeInfo.BuiltInType != Null)
                 {
                     dgvr.Cells[3].Value = dataValue.WrappedValue.TypeInfo.BuiltInType;
                     // dgvr.Cells[3].Value = dataValue.Value.GetType().ToString();
