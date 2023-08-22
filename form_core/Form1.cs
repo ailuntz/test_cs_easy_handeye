@@ -1861,7 +1861,7 @@ namespace test_cs_easy_handeye
             //PhoXiDevice.Disconnect();
         }
 
-        //BGR24位数据转Bitmap
+        //数组数据转Bitmap
         public Bitmap BGR24ToBitmap(float[] imgBGR, int vw, int vh)
         {
 
@@ -3639,12 +3639,12 @@ namespace test_cs_easy_handeye
             string Robotpose3DdataTypes = "euler";
             //string Robotpose3DdataTypes = "RotVector";
 
-            string Campose3DdataTypes = "quat";
-            //string Campose3DdataTypes = "euler";
+            //string Campose3DdataTypes = "quat";
+            string Campose3DdataTypes = "euler";
             //string Campose3DdataTypes = "RotVector";
 
             //Robotpose3D数组形式数据
-            /* x, y, z, rx, ry, rz//Robotpose3D第一组数据 eye-in-hand//rad//结果R=rx, ry, rz ,rw=-0.3546426, 0.3806739, 0.6086649, 0.5990351//T=tx, ty, tz= 149.8673153645521, 18.5544654988438, 308.2450983655534
+            //* x, y, z, rx, ry, rz//Robotpose3D第一组数据 eye-in-hand//rad//结果R=rx, ry, rz ,rw=-0.3546426, 0.3806739, 0.6086649, 0.5990351//T=tx, ty, tz= 149.8673153645521, 18.5544654988438, 308.2450983655534
             double[,] _gripper2base_array_data = new double[,] { {144.4521161, 66.1347948, -465.7051590, -0.4743987, -0.2368566, -0.0782465},
                                                              {150.2226899, 62.4463700, -484.2951369, -0.4732508,-0.2369567, -0.073467},
                                                              {206.6077654, -27.9324378, -448.4078075, -0.6758548, -0.2354039, -0.1120374},
@@ -3661,7 +3661,7 @@ namespace test_cs_easy_handeye
                                                      {402.21, 291.88, 557.76, -1.4454816, 1.1091567, -1.3946927},
                                                     };//*/
 
-            //* x, y, z, rx, ry, rz//zyx//Robotpose3D第三组数据（现场采集） hand-to-eye//rad//结果R=\
+            /* x, y, z, rx, ry, rz//zyx//Robotpose3D第三组数据（现场采集） hand-to-eye//rad//结果R=\
             double[,] _gripper2base_array_data = new double[,] {
                 {867.699,   71.162,  385.037, 180, 0,   0},
                 {855.409,   74.817 , 391.161, 172.903 ,-8.948 ,-10.337 },
@@ -3727,7 +3727,7 @@ namespace test_cs_easy_handeye
 
 
             //Campose3D数组形式数据
-            /* x, y, z, rx, ry, rz//Campose3D第一组数据 eye-in-hand//rad
+            //* x, y, z, rx, ry, rz//Campose3D第一组数据 eye-in-hand//rad
             double[,] _gTarget2cam_array_data = new double[,] { {63.0860126137940, 28.9610333193357, 228.975775155220, -0.1689782, -0.0952185, -2.9322395},
                                                              {59.7442727478359, 35.5178297229849, 212.756111469042, -0.1531844,-0.09427, -2.9339173},
                                                              {-11.9672134192024, 40.7904688256321, 233.030780465295, -0.1634773, -0.0894502, -2.7370669},
@@ -3743,7 +3743,7 @@ namespace test_cs_easy_handeye
                                                              {-55.0705381175398, -26.7901391225223, 143.932686495397, -0.0436629, 0.0437994, 0.1565832},
                                                              {-59.7908161911226, -10.7263017825663, 154.702510082749, -0.0523258, 0.0306989, 0.4666219},
                                                             };//*/
-            //* x, y, z, rx, ry, rz//Campose3D第三组数据 hand-to-eye//rad//
+            /* x, y, z, rx, ry, rz//Campose3D第三组数据 hand-to-eye//rad//
             double[,] _gTarget2cam_array_data = new double[,] { 
                 {27.6324, -53.0011, 450.756, 0.121504, -0.644529, 0.751784, 0.068111 },
                 {-11.0989, -58.8588, 486.592, 0.120802 ,-0.578598, 0.805448 ,-0.043418 },
