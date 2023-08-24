@@ -33,6 +33,7 @@
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.6.0.20220608" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="api_phoxi\" />
     <Folder Include="dll_core\" />
   </ItemGroup>
   <ItemGroup>

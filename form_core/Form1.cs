@@ -33,6 +33,8 @@ using static OpenCvSharp.Stitcher;
 using OpenCvSharp.Flann;
 using System.Drawing.Drawing2D;
 using static System.Net.WebRequestMethods;
+using System.Drawing.Imaging;
+using System.Xml.Linq;
 
 namespace test_cs_easy_handeye
 {
@@ -1872,37 +1874,32 @@ namespace test_cs_easy_handeye
 
             ////量化
             Srcquantification Srcquantificationtemp = new Srcquantification();
-
-            Srcquantificationtemp.Srcmax = 3.402823466e+38F;
-            Srcquantificationtemp.Srcmin = 1.175494351e-38F;
+            Srcquantificationtemp.Srcmax = 2800;
+            Srcquantificationtemp.Srcmin = 0;
             Dstquantification Dstquantificationtemp = new Dstquantification();
-
-            Dstquantificationtemp.Dstmax = 255;
+            Dstquantificationtemp.Dstmax = 127;
             Dstquantificationtemp.Dstmin = 0;
-
             Utilsquantification.Quantification(Srcquantificationtemp, Dstquantificationtemp, out float Scalin, out float zero);
-
-            float[] src = { 2.1f, 8.6f };
-            sbyte[] dst = new sbyte[src.Length];
-
-            Utilsquantification.Quantificationout(Scalin, zero, src, out dst);
             ////
 
-
-
-            Bitmap bmp = new Bitmap(vW, vH, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            Bitmap bmp = new Bitmap(vW, vH, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
 
             if (imgBGR != null)
             {
                 //构造一个位图数组进行数据存储
-                byte[] rgbvalues = new byte[imgBGR.Length*3];
-
+                byte[] rgbvalues = new byte[imgBGR.Length*1];
+                float[] src = new float[1];
+                sbyte[] dst = new sbyte[1];
                 //对每一个像素的颜色进行转化
-                for (int i = 0; i < rgbvalues.Length; i += 3)
+                for (int i = 0; i < rgbvalues.Length; i += 1)
                 {
-                    rgbvalues[i] = (byte)imgBGR[i/3];
-                    rgbvalues[i + 1] = (byte)imgBGR[i/3];
-                    rgbvalues[i + 2] = (byte)imgBGR[i/3];
+
+
+                    src[0] =(float)imgBGR[i];
+                    dst[0] = 0;
+                    Utilsquantification.Quantificationout(Scalin, zero, src, out dst);
+
+                    rgbvalues[i] = (byte)((byte)dst[0]*2);
                 }
 
                 //位图矩形
@@ -1915,13 +1912,25 @@ namespace test_cs_easy_handeye
                 //将被锁定的位图数据复制到该数组内
                 //System.Runtime.InteropServices.Marshal.Copy(ptr, rgbvalues, 0, imgBGR.Length);
                 //把处理后的图像数组复制回图像
-                System.Runtime.InteropServices.Marshal.Copy(rgbvalues, 0, ptr, imgBGR.Length);
+                System.Runtime.InteropServices.Marshal.Copy(rgbvalues, 0, ptr, imgBGR.Length*1);
                 //解锁位图像素
                 bmp.UnlockBits(bmpdata);
+
+
+                short COLOR_COUNT = 256;
+                ColorPalette cptemp = bmp.Palette;
+                for (int i = 0; i < COLOR_COUNT; i++)
+                {
+                    cptemp.Entries[i] = Color.FromArgb(255, i, i, i);
+                }
+                bmp.Palette = cptemp;
+
+
 
             }
             return bmp;
         }
+
 
         /*public Bitmap BGR24ToBitmap(float[] imgBGR, int vw, int vh)
         {
@@ -2433,6 +2442,35 @@ namespace test_cs_easy_handeye
         //从相机获取内参矩阵
         private void GetinternalparameterfromCam()
         {
+            //Retrieving the CalibrationSettings
+            var calibrationSettings = PhoXiDevice.CalibrationSettings;
+            //Check if the currentCalibrationSettings have been retrieved succesfully
+            if (!PhoXiDevice.CalibrationSettingsFeature.isLastOperationSuccessful())
+            {
+                throw new Exception(PhoXiDevice.CalibrationSettingsFeature.GetLastErrorMessage());
+            }
+            Console.WriteLine("    FocusLength: {0}", calibrationSettings.FocusLength);
+            Console.WriteLine("    PixelSize: {0} x {1}",
+                        calibrationSettings.PixelSize.Width,
+                        calibrationSettings.PixelSize.Height);
+
+            if (calibrationSettings.CameraMatrix.Empty())
+            {
+                Console.WriteLine("{0}: [empty]", "CameraMatrix");
+            }
+            else
+            {
+                double[,] cameraMatrixtemparry = new double[3, 3];
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        cameraMatrixtemparry[i, j] = (double)calibrationSettings.CameraMatrix[i, j];
+                    }
+                }
+                cameraMatrix = new Mat(3, 3, MatType.CV_64FC1, cameraMatrixtemparry);
+            }
+
 
         }
 
@@ -2465,13 +2503,37 @@ namespace test_cs_easy_handeye
         //从相机获取畸变矩阵
         private void GetdistCoeffsfromCam()
         {
+            //Retrieving the CalibrationSettings
+            var calibrationSettings = PhoXiDevice.CalibrationSettings;
+            //Check if the currentCalibrationSettings have been retrieved succesfully
+            if (!PhoXiDevice.CalibrationSettingsFeature.isLastOperationSuccessful())
+            {
+                throw new Exception(PhoXiDevice.CalibrationSettingsFeature.GetLastErrorMessage());
+            }
 
+            var distCoeffsarry = calibrationSettings.GetDistortionCoefficients();
+            if (distCoeffsarry.Length == 0)
+            {
+                Console.WriteLine("Distortion coefficients are empty");
+            }
+            else
+            {
+                double[,] distCoeffstemp = new double[1, 5];
+                for (int i = 0; i < 5; i++)
+                {
+                    distCoeffstemp[0, i] = distCoeffsarry[i];
+                }
+
+                distCoeffs = new Mat(1, 5, MatType.CV_64FC1, distCoeffstemp);
+
+            }
         }
 
         //将畸变矩阵展示到表格
         private void ShowdistCoeffstoForm()
         {
             double[,] distCoeffstemp = ConvertMattoArray(distCoeffs, false);
+
             for (int i = 0; i < dataGridView5.ColumnCount; i++)
             {
                 dataGridView5.Rows[0].Cells[i].Value = distCoeffstemp[0, i].ToString();
